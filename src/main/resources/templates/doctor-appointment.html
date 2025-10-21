@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>New Appointment Scheduled</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style>
+        body { font-family: Inter, Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
+        .header { background-color: #3b82f6; color: #ffffff; padding: 20px; text-align: center; }
+        .content { padding: 30px; line-height: 1.6; color: #333333; }
+        .details-box { background-color: #f7f7f7; padding: 15px; border-radius: 4px; margin-bottom: 20px; border-left: 4px solid #3b82f6; }
+        .button-container { text-align: center; margin: 25px 0; }
+        .button { display: inline-block; padding: 12px 25px; background-color: #3b82f6; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold; }
+        .footer { background-color: #eeeeee; color: #666666; padding: 20px; text-align: center; font-size: 0.9em; border-top: 1px solid #dddddd; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h2>New Appointment Scheduled</h2>
+    </div>
+    <div class="content">
+        <p>Dear Dr <strong th:text="${doctorName}"></strong>,</p>
+        <p>A new appointment has been successfully booked for you.</p>
+
+        <div class="details-box">
+            <p><strong>Patient:</strong> <span th:text="${patientFullName}"></span></p>
+            <p><strong>Date & Time:</strong> <strong th:text="${appointmentTime}"></strong></p>
+            <p><strong>Type:</strong> <span th:text="${isVirtual ? 'Virtual Consultation' : 'In-Person Appointment'}"></span></p>
+            <p><strong>Initial Symptoms:</strong> <span th:text="${initialSymptoms}"></span></p>
+            <p><strong>Purpose Of Consultation:</strong> <span th:text="${purposeOfConsultation}"></span></p>
+        </div>
+
+        <div th:if="${isVirtual}">
+            <p><strong>Meeting Link: <span th:text="${meetingLink}"></span></strong></p>
+            <div class="button-container">
+                <a th:href="${meetingLink}" class="button">Join Consultation</a>
+            </div>
+        </div>
+
+        <p>Please review the patient's file before the consultation.</p>
+        <p>Thank you,<br>The DAT Health Team</p>
+    </div>
+    <div class="footer">
+        &copy; <span th:text="${T(java.time.Year).now()}">2026</span> DAT Health. All rights reserved.
+    </div>
+</div>
+</body>
+</html>

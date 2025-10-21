@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Appointment Cancellation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style>
+        body { font-family: Inter, Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
+        .header { background-color: #f97316; color: #ffffff; padding: 20px; text-align: center; }
+        .content { padding: 30px; line-height: 1.6; color: #333333; }
+        .details-box { background-color: #fff7ed; padding: 15px; border-radius: 4px; margin-bottom: 20px; border-left: 4px solid #f97316; }
+        .footer { background-color: #eeeeee; color: #666666; padding: 20px; text-align: center; font-size: 0.9em; border-top: 1px solid #dddddd; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h2>Appointment Canceled</h2>
+    </div>
+    <div class="content">
+        <p>Dear <strong th:text="${recipientName}"></strong>,</p>
+        <p>Please note that the following appointment has been canceled by <strong th:text="${cancellingPartyName}"></strong>.</p>
+
+        <div class="details-box">
+            <p><strong>Patient:</strong> <span th:text="${patientFullName}"></span></p>
+            <p><strong>Doctor: </strong> Dr. <span th:text="${doctorName}"></span></p>
+            <p><strong>Initial Appointment Time: </strong> <strong th:text="${appointmentTime}">appointmentTime</strong></p>
+            <p><strong>Canceled by:</strong>  <span th:text="${cancellingPartyName}"></span></p>
+        </div>
+
+        <p>We apologize for any inconvenience. Please reschedule or contact the other party if necessary.</p>
+        <p>The DAT Health Team</p>
+    </div>
+    <div class="footer">
+        &copy; <span th:text="${T(java.time.Year).now()}">2026</span> DAT Health. All rights reserved.
+    </div>
+</div>
+</body>
+</html>
