@@ -37,7 +37,9 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final NotificationService notificationService;
 
-    private final String uploadDir = "uploads/profile-pictures/";
+//    private final String uploadDir = "uploads/profile-pictures/"; //backend location for saving images
+
+    private final String uploadDir = "/Users/mac/phegonDev/dat-react/public/profile-picture/"; //frontend location for saving images
 
 
     @Override
@@ -167,7 +169,9 @@ public class UserServiceImpl implements UserService {
 
             Files.copy(file.getInputStream(), filePath);
 
-            String fileUrl = uploadDir + newFileName;
+//            String fileUrl = uploadDir + newFileName;
+            String fileUrl = "/profile-picture/" + newFileName;
+
 
             user.setProfilePictureUrl(fileUrl);
             userRepo.save(user);

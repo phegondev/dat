@@ -4,8 +4,6 @@ package com.example.dat.users.service;
 import com.example.dat.users.repo.PasswordResetRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 

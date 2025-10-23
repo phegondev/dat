@@ -291,7 +291,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         Map<String, Object> patientVars = new HashMap<>();
         patientVars.put("patientName", patientUser.getName());
-        patientVars.put("doctorName", appointment.getDoctor().getFirstName());
+        patientVars.put("doctorName", appointment.getDoctor().getUser().getName());
         patientVars.put("appointmentTime", formattedTime);
         patientVars.put("isVirtual", true);
         patientVars.put("meetingLink", appointment.getMeetingLink());
