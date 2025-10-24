@@ -8,6 +8,8 @@ uploads/
 # BlueJ files
 *.ctxt
 .idea
+.DS_Store
+env(.env)
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
