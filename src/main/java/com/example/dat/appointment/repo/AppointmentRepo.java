@@ -11,7 +11,6 @@ import java.util.List;
 public interface AppointmentRepo extends JpaRepository<Appointment, Long> {
 
 
-
     //fetch appointment of the doctor
     List<Appointment> findByDoctor_User_IdOrderByIdDesc(Long userId);
 
@@ -30,5 +29,4 @@ public interface AppointmentRepo extends JpaRepository<Appointment, Long> {
             @Param("newStartTime") LocalDateTime newStartTime,
             @Param("newEndTime") LocalDateTime newEndTime
     );
-
 }

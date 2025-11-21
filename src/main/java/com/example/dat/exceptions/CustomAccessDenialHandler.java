@@ -1,6 +1,5 @@
 package com.example.dat.exceptions;
 
-
 import com.example.dat.res.Response;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,7 +15,7 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-public class CustomAccessDenialHandler  implements AccessDeniedHandler {
+public class CustomAccessDenialHandler implements AccessDeniedHandler {
 
     private final ObjectMapper objectMapper;
 
@@ -26,17 +25,24 @@ public class CustomAccessDenialHandler  implements AccessDeniedHandler {
                        AccessDeniedException accessDeniedException)
             throws IOException, ServletException {
 
-        Response<?> errorResponse = Response.builder()
-                .statusCode(HttpStatus.FORBIDDEN.value()) //403. valid jwt. but user not permitted to access the route
+        Response<?> responseResponse = Response.builder()
+                .statusCode(HttpStatus.FORBIDDEN.value()) // 404. valid jwt. but user not permitted to access the route
                 .message(accessDeniedException.getMessage())
                 .build();
 
+
         response.setContentType("application/json");
         response.setStatus(HttpStatus.FORBIDDEN.value());
-        response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
+        response.getWriter().write(objectMapper.writeValueAsString(responseResponse));
 
     }
 }
+
+
+
+
+
+
 
 
 

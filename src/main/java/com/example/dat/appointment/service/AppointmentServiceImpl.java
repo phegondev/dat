@@ -1,6 +1,5 @@
 package com.example.dat.appointment.service;
 
-
 import com.example.dat.appointment.dto.AppointmentDTO;
 import com.example.dat.appointment.entity.Appointment;
 import com.example.dat.appointment.repo.AppointmentRepo;
@@ -28,10 +27,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AppointmentServiceImpl implements AppointmentService {
+
 
     private final AppointmentRepo appointmentRepo;
     private final PatientRepo patientRepo;
@@ -40,12 +41,12 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final ModelMapper modelMapper;
     private final NotificationService notificationService;
 
-
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("EEEE, MMM dd, yyyy 'at' hh:mm a");
 
 
     @Override
     public Response<AppointmentDTO> bookAppointment(AppointmentDTO appointmentDTO) {
+
 
         User currentUser = userService.getCurrentUser();
 
@@ -56,7 +57,6 @@ public class AppointmentServiceImpl implements AppointmentService {
         // 2. Get the target doctor
         Doctor doctor = doctorRepo.findById(appointmentDTO.getDoctorId())
                 .orElseThrow(() -> new NotFoundException("Doctor not found."));
-
 
         // --- START: VALIDATION LOGIC ---
         // Define the proposed time slot and the end time
@@ -71,7 +71,6 @@ public class AppointmentServiceImpl implements AppointmentService {
         //This code snippet logic used to enforce a mandatory one-hour break (or buffer) for the doctor before a new appointment.
         LocalDateTime checkStart = startTime.minusMinutes(60);
 
-
         // We only need to check for existing appointments whose END TIME overlaps with
         // the proposed start time, OR whose START TIME overlaps with the proposed end time.
 
@@ -85,12 +84,10 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new BadRequestException("Doctor is not available at the requested time. Please check their schedule.");
         }
 
-
         // 4a. Generate a unique, random string for the room name.
         //    (Your existing code is good for this)
         String uuid = UUID.randomUUID().toString().replace("-", "");
         String uniqueRoomName = "dat-" + uuid.substring(0, 10);
-
 
         // 4b. Use the public Jitsi Meet domain with your unique room name
         String meetingLink = "https://meet.jit.si/" + uniqueRoomName;
@@ -119,18 +116,15 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .message("Appointment booked successfully.")
                 .build();
 
-
     }
-
 
     @Override
     public Response<List<AppointmentDTO>> getMyAppointments() {
 
         User user = userService.getCurrentUser();
-
         Long userId = user.getId();
-
         List<Appointment> appointments;
+
 
         // Check for "DOCTOR" role
         boolean isDoctor = user.getRoles().stream()
@@ -143,7 +137,6 @@ public class AppointmentServiceImpl implements AppointmentService {
 
             // 2. Efficiently fetch appointments of the Doctor
             appointments = appointmentRepo.findByDoctor_User_IdOrderByIdDesc(userId);
-
         } else {
 
             // 1. Check for Patient profile existence
@@ -153,6 +146,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             // 2. Efficiently fetch appointments using the User ID to navigate Patient relationship
             appointments = appointmentRepo.findByPatient_User_IdOrderByIdDesc(userId);
         }
+
         // Convert the list of entities to DTOs in a single step
         List<AppointmentDTO> appointmentDTOList = appointments.stream()
                 .map(appointment -> modelMapper.map(appointment, AppointmentDTO.class))
@@ -167,13 +161,12 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    public Response<AppointmentDTO> cancelAppointment(Long appointmentId) {
+    public Response<?> cancelAppointment(Long appointmentId) {
 
         User user = userService.getCurrentUser();
 
         Appointment appointment = appointmentRepo.findById(appointmentId)
                 .orElseThrow(() -> new NotFoundException("Appointment not found."));
-
 
         // Add security check: only the patient or doctor involved can cancel
         boolean isOwner = appointment.getPatient().getUser().getId().equals(user.getId()) ||
@@ -182,6 +175,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         if (!isOwner) {
             throw new BadRequestException("You do not have permission to cancel this appointment.");
         }
+
 
         // Update status
         appointment.setStatus(AppointmentStatus.CANCELLED);
@@ -216,18 +210,68 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointment.setStatus(AppointmentStatus.COMPLETED);
         appointment.setEndTime(LocalDateTime.now());
 
-        Appointment updatedAppointment = appointmentRepo.save(appointment);
-
-        modelMapper.map(updatedAppointment, AppointmentDTO.class);
+        appointmentRepo.save(appointment);
 
         return Response.builder()
                 .statusCode(200)
                 .message("Appointment successfully marked as completed. You may now proceed to create the consultation notes.")
                 .build();
-
     }
 
-    private void sendAppointmentCancellation(Appointment appointment, User cancelingUser){
+
+    private void sendAppointmentConfirmation(Appointment appointment) {
+
+        // --- 1. Prepare Patient Notification ---
+        User patientUser = appointment.getPatient().getUser();
+        String formattedTime = appointment.getStartTime().format(FORMATTER);
+
+
+        Map<String, Object> patientVars = new HashMap<>();
+
+        patientVars.put("patientName", patientUser.getName());
+        patientVars.put("doctorName", appointment.getDoctor().getUser().getName());
+        patientVars.put("appointmentTime", formattedTime);
+        patientVars.put("isVirtual", true);
+        patientVars.put("meetingLink", appointment.getMeetingLink());
+        patientVars.put("purposeOfConsultation", appointment.getPurposeOfConsultation());
+
+        NotificationDTO patientNotification = NotificationDTO.builder()
+                .recipient(patientUser.getEmail())
+                .subject("DAT Health: Your Appointment is Confirmed")
+                .templateName("patient-appointment")
+                .templateVariables(patientVars)
+                .build();
+
+        // Dispatch patient email using the low-level service
+        notificationService.sendEmail(patientNotification, patientUser);
+        log.info("Dispatched confirmation email for patient: {}", patientUser.getEmail());
+
+
+        // --- 2. Prepare Doctor Notification ---
+        User doctorUser = appointment.getDoctor().getUser();
+
+        Map<String, Object> doctorVars = new HashMap<>();
+        doctorVars.put("doctorName", doctorUser.getName());
+        doctorVars.put("patientFullName", patientUser.getName());
+        doctorVars.put("appointmentTime", formattedTime);
+        doctorVars.put("isVirtual", true);
+        doctorVars.put("meetingLink", appointment.getMeetingLink());
+        doctorVars.put("initialSymptoms", appointment.getInitialSymptoms());
+        doctorVars.put("purposeOfConsultation", appointment.getPurposeOfConsultation());
+
+        NotificationDTO doctorNotification = NotificationDTO.builder()
+                .recipient(doctorUser.getEmail())
+                .subject("DAT Health: New Appointment Booked")
+                .templateName("doctor-appointment")
+                .templateVariables(doctorVars)
+                .build();
+
+        // Dispatch doctor email using the low-level service
+        notificationService.sendEmail(doctorNotification, doctorUser);
+        log.info("Dispatched new appointment email for doctor: {}", doctorUser.getEmail());
+    }
+
+    private void sendAppointmentCancellation(Appointment appointment, User cancelingUser) {
 
         User patientUser = appointment.getPatient().getUser();
         User doctorUser = appointment.getDoctor().getUser();
@@ -279,62 +323,12 @@ public class AppointmentServiceImpl implements AppointmentService {
         notificationService.sendEmail(patientNotification, patientUser);
         log.info("Dispatched cancellation email to Patient: {}", patientUser.getEmail());
 
-    }
 
-
-    private void sendAppointmentConfirmation(Appointment appointment) {
-
-        // --- 1. Prepare Patient Notification ---
-        User patientUser = appointment.getPatient().getUser();
-        String formattedTime = appointment.getStartTime().format(FORMATTER);
-
-
-        Map<String, Object> patientVars = new HashMap<>();
-        patientVars.put("patientName", patientUser.getName());
-        patientVars.put("doctorName", appointment.getDoctor().getUser().getName());
-        patientVars.put("appointmentTime", formattedTime);
-        patientVars.put("isVirtual", true);
-        patientVars.put("meetingLink", appointment.getMeetingLink());
-        patientVars.put("purposeOfConsultation", appointment.getPurposeOfConsultation());
-
-        NotificationDTO patientNotification = NotificationDTO.builder()
-                .recipient(patientUser.getEmail())
-                .subject("DAT Health: Your Appointment is Confirmed")
-                .templateName("patient-appointment")
-                .templateVariables(patientVars)
-                .build();
-
-
-        // Dispatch patient email using the low-level service
-        notificationService.sendEmail(patientNotification, patientUser);
-        log.info("Dispatched confirmation email for patient: {}", patientUser.getEmail());
-
-
-        // --- 2. Prepare Doctor Notification ---
-        User doctorUser = appointment.getDoctor().getUser();
-
-        Map<String, Object> doctorVars = new HashMap<>();
-        doctorVars.put("doctorName", doctorUser.getName());
-        doctorVars.put("patientFullName", patientUser.getName());
-        doctorVars.put("appointmentTime", formattedTime);
-        doctorVars.put("isVirtual", true);
-        doctorVars.put("meetingLink", appointment.getMeetingLink());
-        doctorVars.put("initialSymptoms", appointment.getInitialSymptoms());
-        doctorVars.put("purposeOfConsultation", appointment.getPurposeOfConsultation());
-
-        NotificationDTO doctorNotification = NotificationDTO.builder()
-                .recipient(doctorUser.getEmail())
-                .subject("DAT Health: New Appointment Booked")
-                .templateName("doctor-appointment")
-                .templateVariables(doctorVars)
-                .build();
-
-
-        // Dispatch doctor email using the low-level service
-        notificationService.sendEmail(doctorNotification, doctorUser);
-        log.info("Dispatched new appointment email for doctor: {}", doctorUser.getEmail());
     }
 }
+
+
+
 
 
 

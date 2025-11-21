@@ -21,32 +21,36 @@ public class PatientController {
 
     @GetMapping("/me")
     @PreAuthorize("hasAuthority('PATIENT')")
-    public ResponseEntity<Response<PatientDTO>> getPatientProfile() {
+    public ResponseEntity<Response<PatientDTO>> getPatientProfile(){
         return ResponseEntity.ok(patientService.getPatientProfile());
     }
 
     @PutMapping("/me")
     @PreAuthorize("hasAuthority('PATIENT')")
-    public ResponseEntity<Response<?>> updatePatientProfile(@RequestBody PatientDTO patientDTO) {
+    public ResponseEntity<Response<?>> updatePatientProfile(@RequestBody PatientDTO patientDTO){
         return ResponseEntity.ok(patientService.updatePatientProfile(patientDTO));
     }
 
-
     @GetMapping("/{patientId}")
-    public ResponseEntity<Response<PatientDTO>> getPatientById(@PathVariable Long patientId) {
+    public ResponseEntity<Response<PatientDTO>> getPatientById(@PathVariable Long patientId){
         return ResponseEntity.ok(patientService.getPatientById(patientId));
     }
 
-
     @GetMapping("/bloodgroup")
-    public ResponseEntity<Response<List<BloodGroup>>> getAllBloodGroupEnums() {
+    public ResponseEntity<Response<List<BloodGroup>>> getAllBloodGroupEnums(){
         return ResponseEntity.ok(patientService.getAllBloodGroupEnums());
     }
 
     @GetMapping("/genotype")
-    public ResponseEntity<Response<List<Genotype>>> getAllGenotypeEnums() {
+    public ResponseEntity<Response<List<Genotype>>> getAllGenotypeEnums(){
         return ResponseEntity.ok(patientService.getAllGenotypeEnums());
     }
+
+
+
+
+
+
 
 
 }

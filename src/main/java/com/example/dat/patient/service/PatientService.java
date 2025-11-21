@@ -9,7 +9,6 @@ import java.util.List;
 
 public interface PatientService {
 
-
     Response<PatientDTO> getPatientProfile();
 
     Response<?> updatePatientProfile(PatientDTO patientDTO);
@@ -17,6 +16,6 @@ public interface PatientService {
     Response<PatientDTO> getPatientById(Long patientId);
 
     Response<List<BloodGroup>> getAllBloodGroupEnums();
-    Response<List<Genotype>>getAllGenotypeEnums();
 
+    Response<List<Genotype>> getAllGenotypeEnums();
 }

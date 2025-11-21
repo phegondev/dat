@@ -7,11 +7,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "roles")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "roles")
 public class Role {
 
     @Id

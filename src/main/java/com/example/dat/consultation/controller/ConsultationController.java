@@ -16,28 +16,30 @@ import java.util.List;
 @RequestMapping("/api/consultations")
 public class ConsultationController {
 
-
     private final ConsultationService consultationService;
 
     @PostMapping
     @PreAuthorize("hasAuthority('DOCTOR')")
-    public ResponseEntity<Response<ConsultationDTO>> createConsultation(
-            @RequestBody ConsultationDTO consultationDTO) {
+    public ResponseEntity<Response<ConsultationDTO>> createConsultation(@RequestBody ConsultationDTO consultationDTO){
         return ResponseEntity.ok(consultationService.createConsultation(consultationDTO));
     }
 
     @GetMapping("/appointment/{appointmentId}")
-    public ResponseEntity<Response<ConsultationDTO>> getConsultationByAppointmentId(@PathVariable Long appointmentId) {
+    public ResponseEntity<Response<ConsultationDTO>> getConsultationByAppointmentId(@PathVariable Long appointmentId){
         return ResponseEntity.ok(consultationService.getConsultationByAppointmentId(appointmentId));
     }
 
     @GetMapping("/history")
     public ResponseEntity<Response<List<ConsultationDTO>>> getConsultationHistoryForPatient(
-            @RequestParam(required = false) Long patientId) {
+            @RequestParam(required = false) Long patientId){
         return ResponseEntity.ok(consultationService.getConsultationHistoryForPatient(patientId));
     }
 
 }
+
+
+
+
 
 
 

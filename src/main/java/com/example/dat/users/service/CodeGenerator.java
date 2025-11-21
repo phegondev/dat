@@ -1,6 +1,5 @@
 package com.example.dat.users.service;
 
-
 import com.example.dat.users.repo.PasswordResetRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -13,23 +12,21 @@ public class CodeGenerator {
 
     private final PasswordResetRepo passwordResetRepo;
 
-    private static  final String ALPHA_NUMERIC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private static final String ALPHA_NUMERIC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private static final int CODE_LENGTH = 5;
-
 
 
     public String generateUniqueCode() {
         String code;
         do {
             code = generateRandomCode();
-
         } while (passwordResetRepo.findByCode(code).isPresent());
 
         return code;
     }
 
-
     private String generateRandomCode() {
+
         StringBuilder sb = new StringBuilder(CODE_LENGTH);
         SecureRandom random = new SecureRandom();
 
@@ -39,5 +36,13 @@ public class CodeGenerator {
         }
         return sb.toString();
     }
-
 }
+
+
+
+
+
+
+
+
+

@@ -1,6 +1,5 @@
 package com.example.dat.users.dto;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
@@ -14,4 +13,6 @@ public class ResetPasswordRequest {
     //will be used to set new password
     private String code;
     private String newPassword;
+
+
 }

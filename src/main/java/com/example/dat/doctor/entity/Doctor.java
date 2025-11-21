@@ -12,13 +12,12 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Entity
+@Table(name = "doctors")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "doctors")
 public class Doctor {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,4 +37,19 @@ public class Doctor {
 
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Appointment> appointments;
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

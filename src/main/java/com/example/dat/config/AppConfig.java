@@ -13,8 +13,8 @@ public class AppConfig {
     @Bean
     public SpringTemplateEngine templateEngine(){
         SpringTemplateEngine templateEngine = new SpringTemplateEngine();
-
         ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
+
         templateResolver.setPrefix("templates/");
         templateResolver.setSuffix(".html");
         templateResolver.setCharacterEncoding("UTF-8");
@@ -25,16 +25,19 @@ public class AppConfig {
 
 
     @Bean
-    public ModelMapper modelMapperConfig(){
-
+    public ModelMapper modelMapper(){
         ModelMapper modelMapper = new ModelMapper();
+
         modelMapper.getConfiguration()
                 .setFieldMatchingEnabled(true)
                 .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE)
                 .setMatchingStrategy(MatchingStrategies.STANDARD);
+
         return modelMapper;
     }
+
 }
+
 
 
 

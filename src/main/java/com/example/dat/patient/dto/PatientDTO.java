@@ -4,14 +4,17 @@ package com.example.dat.patient.dto;
 import com.example.dat.enums.BloodGroup;
 import com.example.dat.enums.Genotype;
 import com.example.dat.users.dto.UserDTO;
+import com.example.dat.users.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Builder

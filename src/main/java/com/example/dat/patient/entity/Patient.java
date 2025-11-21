@@ -15,11 +15,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
+@Table(name = "patients")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "patients")
 public class Patient {
 
     @Id
@@ -30,8 +30,6 @@ public class Patient {
     private String lastName;
     private LocalDate dateOfBirth;
     private String phone;
-
-    // Essential Medical Fields (simplified for a remote system)
 
     @Lob // Stores allergies as a comma-separated string
     private String knownAllergies;
@@ -47,5 +45,15 @@ public class Patient {
     private User user;
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Appointment> appointments;
+    private List<Appointment> Appointment;
+
 }
+
+
+
+
+
+
+
+
+

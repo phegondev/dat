@@ -1,8 +1,8 @@
 package com.example.dat.users.service;
 
-
 import com.example.dat.doctor.entity.Doctor;
 import com.example.dat.doctor.repo.DoctorRepo;
+import com.example.dat.enums.AuthProvider;
 import com.example.dat.exceptions.BadRequestException;
 import com.example.dat.exceptions.NotFoundException;
 import com.example.dat.notification.dto.NotificationDTO;
@@ -26,18 +26,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class AuthServiceImpl implements AuthService{
+public class AuthServiceImpl implements AuthService {
 
     private final UserRepo userRepo;
     private final RoleRepo roleRepo;
@@ -48,9 +51,8 @@ public class AuthServiceImpl implements AuthService{
     private final PatientRepo patientRepo;
     private final DoctorRepo doctorRepo;
 
-    private final PasswordResetRepo passwordResetRepo;
     private final CodeGenerator codeGenerator;
-
+    private final PasswordResetRepo passwordResetRepo;
 
 
     @Value("${password.reset.link}")
@@ -58,7 +60,6 @@ public class AuthServiceImpl implements AuthService{
 
     @Value("${login.link}")
     private String loginLink;
-
 
 
     @Override
@@ -73,7 +74,6 @@ public class AuthServiceImpl implements AuthService{
                 ? request.getRoles().stream().map(String::toUpperCase).toList()
                 : List.of("PATIENT");
 
-
         boolean isDoctor = requestedRoleNames.contains("DOCTOR");
 
         if (isDoctor && (request.getLicenseNumber() == null || request.getLicenseNumber().isBlank())) {
@@ -86,10 +86,10 @@ public class AuthServiceImpl implements AuthService{
                 .flatMap(Optional::stream)
                 .toList();
 
-
         if (roles.isEmpty()) {
             throw new NotFoundException("Registration failed: Requested roles were not found in the database.");
         }
+
         /// 3. Create and save new user entity
         User newUser = User.builder()
                 .email(request.getEmail())
@@ -102,10 +102,7 @@ public class AuthServiceImpl implements AuthService{
 
         log.info("New user registered: {} with {} roles.", savedUser.getEmail(), roles.size());
 
-
         /// 4. Process Profile Creation
-
-
         for (Role role : roles) {
             String roleName = role.getName();
 
@@ -140,7 +137,6 @@ public class AuthServiceImpl implements AuthService{
                 .data(savedUser.getEmail())
                 .build();
 
-
     }
 
     @Override
@@ -149,8 +145,8 @@ public class AuthServiceImpl implements AuthService{
         String email = loginRequest.getEmail();
         String password = loginRequest.getPassword();
 
-
-        User user = userRepo.findByEmail(email).orElseThrow(() -> new NotFoundException("Email Not Found"));
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User Not Found"));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new BadRequestException("Password doesn't match");
@@ -168,7 +164,6 @@ public class AuthServiceImpl implements AuthService{
                 .message("Login Successful")
                 .data(loginResponse)
                 .build();
-
     }
 
     @Override
@@ -190,18 +185,20 @@ public class AuthServiceImpl implements AuthService{
 
         passwordResetRepo.save(resetCode);
 
+
         //send email reset link out
         NotificationDTO passwordResetEmail = NotificationDTO.builder()
                 .recipient(user.getEmail())
                 .subject("Password Reset Code")
                 .templateName("password-reset")
-                .templateVariables(Map.of( // Using Map.of() for concise, immutable map creation
+                .templateVariables(Map.of(
                         "name", user.getName(),
                         "resetLink", resetLink + code
                 ))
                 .build();
 
         notificationService.sendEmail(passwordResetEmail, user);
+
 
         return Response.builder()
                 .statusCode(200)
@@ -218,10 +215,10 @@ public class AuthServiceImpl implements AuthService{
         log.info("CODE IS: " + code);
         log.info("NEW PASSWORD IS: " + newPassword);
 
-
         // Find and validate code
         PasswordResetCode resetCode = passwordResetRepo.findByCode(code)
                 .orElseThrow(() -> new BadRequestException("Invalid reset code"));
+
 
         // Check expiration first
         if (resetCode.getExpiryDate().isBefore(LocalDateTime.now())) {
@@ -237,7 +234,6 @@ public class AuthServiceImpl implements AuthService{
         // Delete the code immediately after successful use
         passwordResetRepo.delete(resetCode);
 
-
         // Send password confirmation email
         NotificationDTO passwordResetEmail = NotificationDTO.builder()
                 .recipient(user.getEmail())
@@ -251,26 +247,90 @@ public class AuthServiceImpl implements AuthService{
         notificationService.sendEmail(passwordResetEmail, user);
 
         return Response.builder()
-                .statusCode(HttpStatus.OK.value())
+                .statusCode(200)
                 .message("Password updated successfully")
                 .build();
 
     }
 
 
+    @Override
+    @Transactional
+    public Response<LoginResponse> loginRegisterByGoogleOAuth2(OAuth2AuthenticationToken authenticationToken) {
 
-    private void createPatientProfile( User user){
+        if(authenticationToken == null){
+            log.error("OAuth2AuthenticationToken is null. Cannot process login/registration.");
+            return Response.<LoginResponse>builder()
+                    .statusCode(HttpStatus.BAD_REQUEST.value())
+                    .message("Authentication token is missing")
+                    .data(null)
+                    .build();
+        }
+        OAuth2User oAuth2User = authenticationToken.getPrincipal();
 
+        String email = oAuth2User.getAttribute("email");
+
+        String firstName = oAuth2User.getAttribute("given_name");
+
+        User user = userRepo.findByEmail(email).orElse(null);
+
+        if(user == null){
+
+            Role defaultRole = roleRepo.findByName("PATIENT")
+                    .orElseThrow(() -> new NotFoundException("PATIENT role Not Found"));
+
+            List<Role> userRoles = List.of(defaultRole);
+
+            assert email != null;
+            User userToSave = User.builder()
+                    .name(firstName)
+                    .email(email.toLowerCase())
+                    .roles(userRoles)
+                    .authProvider(AuthProvider.GOOGLE)
+                    .build();
+
+            user = userRepo.save(userToSave);
+
+            createPatientProfile(user);
+
+            /// 5. Send welcome email out
+            RegistrationRequest registrationRequest = new RegistrationRequest();
+            registrationRequest.setName(user.getName());
+
+            sendRegistrationEmail(registrationRequest, user);
+        }
+
+        String token = jwtService.generateToken(user.getEmail());
+
+        List<String> roleNames = user.getRoles().stream()
+                .map(Role::getName)
+                .collect(Collectors.toList());
+
+
+        LoginResponse loginData = LoginResponse.builder()
+                .token(token)
+                .roles(roleNames)
+                .build();
+
+
+        return Response.<LoginResponse>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Login Successful")
+                .data(loginData)
+                .build();
+    }
+
+
+    private void createPatientProfile(User user) {
         Patient patient = Patient.builder()
                 .user(user)
                 .build();
+
         patientRepo.save(patient);
         log.info("Patient profile created");
-
     }
 
-    private void createDoctorProfile(RegistrationRequest request, User user){
-
+    private void createDoctorProfile(RegistrationRequest request, User user) {
         Doctor doctor = Doctor.builder()
                 .specialization(request.getSpecialization())
                 .licenseNumber(request.getLicenseNumber())
@@ -278,11 +338,12 @@ public class AuthServiceImpl implements AuthService{
                 .build();
 
         doctorRepo.save(doctor);
-
-        log.info("Doctor profile created");
     }
 
-    private void sendRegistrationEmail(RegistrationRequest request, User user){
+    private void sendRegistrationEmail(RegistrationRequest request, User user) {
+
+        log.info("Trying to send Email Out");
+
         NotificationDTO welcomeEmail = NotificationDTO.builder()
                 .recipient(user.getEmail())
                 .subject("Welcome to DAT Health!")
@@ -297,9 +358,22 @@ public class AuthServiceImpl implements AuthService{
         notificationService.sendEmail(welcomeEmail, user);
     }
 
-
     private LocalDateTime calculateExpiryDate() {
         return LocalDateTime.now().plusHours(5);
     }
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

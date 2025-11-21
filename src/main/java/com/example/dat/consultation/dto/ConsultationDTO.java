@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ConsultationDTO {
 
+
     private Long id;
 
     private Long appointmentId;

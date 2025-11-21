@@ -25,14 +25,26 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
                          AuthenticationException authException)
             throws IOException, ServletException {
 
-        Response<?> errorResponse = Response.builder()
-                .statusCode(HttpStatus.UNAUTHORIZED.value()) //401. invalid  jwt.
+        Response<?> responseResponse = Response.builder()
+                .statusCode(HttpStatus.UNAUTHORIZED.value()) // 401. invalid token
                 .message(authException.getMessage())
                 .build();
 
         response.setContentType("application/json");
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
+        response.getWriter().write(objectMapper.writeValueAsString(responseResponse));
 
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+

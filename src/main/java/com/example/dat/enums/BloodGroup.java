@@ -10,5 +10,4 @@ public enum BloodGroup {
     AB_NEGATIVE,
     O_POSITIVE,
     O_NEGATIVE
-
 }

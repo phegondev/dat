@@ -21,13 +21,15 @@
     </div>
     <div class="content">
         <p>Dear <strong th:text="${patientName}"></strong>,</p>
-        <p>Your appointment with <span th:text="${doctorName}"></span> has been successfully scheduled. We look forward to seeing you!</p>
+        <p>Your appointment with <span th:text="${doctorName}"></span> has been successfully scheduled. We look forward
+            to seeing you!</p>
 
         <div class="details-box">
             <p><strong>Doctor: Dr. </strong> <span th:text="${doctorName}"></span></p>
             <p><strong>Date & Time:</strong> <strong th:text="${appointmentTime}"></strong></p>
             <p><strong>Purpose Of Consultation:</strong> <span th:text="${purposeOfConsultation}"></span></p>
-            <p><strong>Type:</strong> <span th:text="${isVirtual ? 'Virtual Consultation' : 'In-Person Appointment'}"></span></p>
+            <p><strong>Type:</strong> <span
+                    th:text="${isVirtual ? 'Virtual Consultation' : 'In-Person Appointment'}"></span></p>
         </div>
 
         <div th:if="${isVirtual}">
@@ -35,7 +37,8 @@
             <div class="button-container">
                 <a th:href="${meetingLink}" class="button">Join Consultation</a>
             </div>
-            <p style="font-size: 0.9em; text-align: center;">Please click the button above a few minutes before your scheduled time.</p>
+            <p style="font-size: 0.9em; text-align: center;">Please click the button above a few minutes before your
+                scheduled time.</p>
         </div>
 
         <p>If you have any questions, please visit your account dashboard.</p>

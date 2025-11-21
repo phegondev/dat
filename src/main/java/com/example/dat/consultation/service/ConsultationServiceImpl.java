@@ -27,12 +27,13 @@ import java.util.List;
 @Slf4j
 public class ConsultationServiceImpl implements ConsultationService{
 
-
     private final ConsultationRepo consultationRepo;
     private final AppointmentRepo appointmentRepo;
     private final UserService userService;
     private final ModelMapper modelMapper;
     private final PatientRepo patientRepo;
+
+
 
     @Override
     public Response<ConsultationDTO> createConsultation(ConsultationDTO consultationDTO) {
@@ -77,18 +78,14 @@ public class ConsultationServiceImpl implements ConsultationService{
     @Override
     public Response<ConsultationDTO> getConsultationByAppointmentId(Long appointmentId) {
 
-        User user = userService.getCurrentUser();
-
         Consultation consultation = consultationRepo.findByAppointmentId(appointmentId)
                 .orElseThrow(() -> new NotFoundException("Consultation notes not found for appointment ID: " + appointmentId));
-
 
         return Response.<ConsultationDTO>builder()
                 .statusCode(200)
                 .message("Consultation notes retrieved successfully.")
                 .data(modelMapper.map(consultation, ConsultationDTO.class))
                 .build();
-
     }
 
     @Override
@@ -106,7 +103,6 @@ public class ConsultationServiceImpl implements ConsultationService{
         // Find the patient to ensure they exist (or to perform future security checks)
         patientRepo.findById(patientId)
                 .orElseThrow(() -> new NotFoundException("Patient not found "));
-
 
         // Use the repository method to fetch all consultations linked via appointments
         List<Consultation> history = consultationRepo.findByAppointmentPatientIdOrderByConsultationDateDesc(patientId);
@@ -131,7 +127,6 @@ public class ConsultationServiceImpl implements ConsultationService{
 
     }
 }
-
 
 
 

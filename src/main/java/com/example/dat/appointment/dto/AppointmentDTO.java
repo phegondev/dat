@@ -25,7 +25,7 @@ public class AppointmentDTO {
 
     private Long id;
 
-    @NotNull(message = "Doctor ID is required for booking.")
+    @NotNull(message = "Doctor ID is required for booking an appointment.")
     private Long doctorId;
 
     private String purposeOfConsultation;
@@ -37,10 +37,30 @@ public class AppointmentDTO {
     private LocalDateTime startTime;
 
     private LocalDateTime endTime;
-    private String meetingLink; // Unique link for the video/tele consultation
+
+    private String meetingLink;
 
     private AppointmentStatus status;
 
     private DoctorDTO doctor;
     private PatientDTO patient;
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

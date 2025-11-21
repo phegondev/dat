@@ -18,17 +18,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class DoctorServiceImpl implements DoctorService{
 
-
     private final DoctorRepo doctorRepo;
     private final UserService userService;
     private final ModelMapper modelMapper;
-
 
     @Override
     public Response<DoctorDTO> getDoctorProfile() {
@@ -36,7 +33,7 @@ public class DoctorServiceImpl implements DoctorService{
         User user = userService.getCurrentUser();
 
         Doctor doctor = doctorRepo.findByUser(user)
-                .orElseThrow(() -> new NotFoundException("Doctor profile not found."));
+                .orElseThrow(()-> new NotFoundException("Doctor Not Found"));
 
         return Response.<DoctorDTO>builder()
                 .statusCode(200)
@@ -64,7 +61,7 @@ public class DoctorServiceImpl implements DoctorService{
         Optional.ofNullable(doctorDTO.getSpecialization()).ifPresent(doctor::setSpecialization);
 
         doctorRepo.save(doctor);
-        log.info("Doctor profile updated ");
+        log.info("Doctor Profile updated");
 
         return Response.builder()
                 .statusCode(200)
@@ -108,21 +105,20 @@ public class DoctorServiceImpl implements DoctorService{
 
         List<Doctor> doctors = doctorRepo.findBySpecialization(specialization);
 
-        List<DoctorDTO> doctorDTOs = doctors.stream()
+        List<DoctorDTO> doctorDTOs= doctors.stream()
                 .map(doctor -> modelMapper.map(doctor, DoctorDTO.class))
                 .toList();
-
 
         String message = doctors.isEmpty() ?
                 "No doctors found for specialization: " + specialization.name() :
                 "Doctors retrieved successfully for specialization: " + specialization.name();
+
 
         return Response.<List<DoctorDTO>>builder()
                 .statusCode(200)
                 .message(message)
                 .data(doctorDTOs)
                 .build();
-
     }
 
     @Override
@@ -137,3 +133,13 @@ public class DoctorServiceImpl implements DoctorService{
                 .build();
     }
 }
+
+
+
+
+
+
+
+
+
+

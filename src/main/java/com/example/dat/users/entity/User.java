@@ -1,6 +1,7 @@
 package com.example.dat.users.entity;
 
 
+import com.example.dat.enums.AuthProvider;
 import com.example.dat.role.entity.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,13 +12,12 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Entity
+@Table(name = "users")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "users")
 public class User {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,15 +28,32 @@ public class User {
     @Column(unique = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    private AuthProvider authProvider = AuthProvider.LOCAL;
 
     private String profilePictureUrl;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"),
-    inverseJoinColumns = @JoinColumn(name = "role_id"))
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List<Role> roles;
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

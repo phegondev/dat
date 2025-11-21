@@ -7,10 +7,10 @@ import java.util.List;
 
 public interface ConsultationService {
 
-    Response<ConsultationDTO> createConsultation(ConsultationDTO consultationDTO);
+    Response<ConsultationDTO>createConsultation(ConsultationDTO consultationDTO);
 
-    Response<ConsultationDTO> getConsultationByAppointmentId(Long appointmentId);
+    Response<ConsultationDTO>getConsultationByAppointmentId(Long appointmentId);
 
-    Response<List<ConsultationDTO>> getConsultationHistoryForPatient(Long patientId);
+    Response<List<ConsultationDTO>>getConsultationHistoryForPatient(Long patientId);
 
 }

@@ -16,6 +16,7 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
+
     @Value("${jwt.secret.string}")
     private String JWT_SECRETE;
 
@@ -25,13 +26,12 @@ public class JwtService {
     private SecretKey key;
 
     @PostConstruct
-    private void init() {
+    private void init(){
         byte[] keyByte = JWT_SECRETE.getBytes(StandardCharsets.UTF_8);
         this.key = new SecretKeySpec(keyByte, "HmacSHA256");
     }
 
-
-    public String generateToken(String email) {
+    public String generateToken(String email){
         return Jwts.builder()
                 .subject(email)
                 .issuedAt(new Date(System.currentTimeMillis()))
@@ -40,9 +40,10 @@ public class JwtService {
                 .compact();
     }
 
-    public String getUsernameFromToken(String token) {
+    public String getUsernameFromToken(String token){
         return extractClaims(token, Claims::getSubject);
     }
+
 
     private <T> T extractClaims(String token, Function<Claims, T> claimsTFunction) {
         return claimsTFunction.apply(Jwts.parser().verifyWith(key)
@@ -62,3 +63,17 @@ public class JwtService {
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

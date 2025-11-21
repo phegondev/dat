@@ -11,11 +11,11 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "consultations")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "consultations")
 public class Consultation {
 
 
@@ -41,3 +41,11 @@ public class Consultation {
     @JoinColumn(name = "appointment_id", unique = true, nullable = false)
     private Appointment appointment;
 }
+
+
+
+
+
+
+
+

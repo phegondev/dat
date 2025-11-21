@@ -11,14 +11,14 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+
 @Entity
 @Table(name = "notifications")
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class Notification {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,11 +30,22 @@ public class Notification {
     private String message;
 
     @Enumerated(EnumType.STRING)
-    private NotificationType type; // EMAIL, SMS, PUSH
+    private NotificationType type; //EMAIL, SMS, PUSH
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
     private final LocalDateTime createdAt = LocalDateTime.now();
+
 }
+
+
+
+
+
+
+
+
+
+

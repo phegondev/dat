@@ -1,6 +1,5 @@
 package com.example.dat.appointment.controller;
 
-
 import com.example.dat.appointment.dto.AppointmentDTO;
 import com.example.dat.appointment.service.AppointmentService;
 import com.example.dat.res.Response;
@@ -17,7 +16,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/appointments")
 public class AppointmentController {
-
     private final AppointmentService appointmentService;
 
     @PostMapping
@@ -26,22 +24,27 @@ public class AppointmentController {
     }
 
     @GetMapping
-    public  ResponseEntity<Response<List<AppointmentDTO>>> getMyAppointments(){
+    public ResponseEntity<Response<List<AppointmentDTO>>> getMyAppointments(){
         return ResponseEntity.ok(appointmentService.getMyAppointments());
     }
 
     @PutMapping("/cancel/{appointmentId}")
-    public  ResponseEntity<Response<AppointmentDTO>> cancelAppointment(@PathVariable Long appointmentId){
+    public ResponseEntity<Response<?>> cancelAppointment(@PathVariable Long appointmentId){
         return ResponseEntity.ok(appointmentService.cancelAppointment(appointmentId));
     }
 
     @PutMapping("/complete/{appointmentId}")
     @PreAuthorize(("hasAuthority('DOCTOR')"))
-    public  ResponseEntity<Response<?>> completeAppointment(@PathVariable Long appointmentId){
+    public ResponseEntity<Response<?>> completeAppointment(@PathVariable Long appointmentId){
         return ResponseEntity.ok(appointmentService.completeAppointment(appointmentId));
     }
-
 }
+
+
+
+
+
+
 
 
 

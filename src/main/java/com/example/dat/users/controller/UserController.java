@@ -1,5 +1,6 @@
 package com.example.dat.users.controller;
 
+
 import com.example.dat.res.Response;
 import com.example.dat.users.dto.UpdatePasswordRequest;
 import com.example.dat.users.dto.UserDTO;
@@ -17,7 +18,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
 public class UserController {
-
     private final UserService userService;
 
     @GetMapping("/me")
@@ -45,6 +45,16 @@ public class UserController {
     public ResponseEntity<Response<?>> uploadProfilePicture(@RequestParam("file")MultipartFile file){
         return ResponseEntity.ok(userService.uploadProfilePicture(file));
     }
-
-    
 }
+
+
+
+
+
+
+
+
+
+
+
+

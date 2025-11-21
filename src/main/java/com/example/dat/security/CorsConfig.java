@@ -6,7 +6,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-
 @Configuration
 public class CorsConfig {
 
@@ -21,7 +20,6 @@ public class CorsConfig {
         config.setMaxAge(3600L);
 
         source.registerCorsConfiguration("/**", config);
-
         return new CorsFilter(source);
     }
 }

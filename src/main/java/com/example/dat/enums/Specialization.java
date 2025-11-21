@@ -11,5 +11,4 @@ public enum Specialization {
     DENTISTRY,
     OPHTHALMOLOGY,
     EMERGENCY_MEDICINE
-
 }

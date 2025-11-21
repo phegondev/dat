@@ -38,8 +38,7 @@ public class UserServiceImpl implements UserService {
     private final NotificationService notificationService;
 
 //    private final String uploadDir = "uploads/profile-pictures/"; //backend location for saving images
-
-    private final String uploadDir = "/Users/mac/phegonDev/dat-react/public/profile-picture/"; //frontend location for saving images
+    private final String uploadDir = "/Users/mac/phegonDev/dat-angular/public/profile-picture/"; //frontend location for saving images
 
 
     @Override
@@ -52,8 +51,8 @@ public class UserServiceImpl implements UserService {
         }
         String email = authentication.getName();
 
-        return userRepo.findByEmail(email).orElseThrow(() -> new NotFoundException("User Not Found"));
-
+        return userRepo.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User Not Found"));
     }
 
     @Override
@@ -68,7 +67,6 @@ public class UserServiceImpl implements UserService {
                 .message("User details retrieved successfully.")
                 .data(userDTO)
                 .build();
-
     }
 
     @Override
@@ -93,7 +91,6 @@ public class UserServiceImpl implements UserService {
                 .map(user -> modelMapper.map(user, UserDTO.class))
                 .toList();
 
-
         return Response.<List<UserDTO>>builder()
                 .statusCode(200)
                 .message("All users retrieved successfully.")
@@ -103,7 +100,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Response<?> updatePassword(UpdatePasswordRequest updatePasswordRequest) {
-
         User user = getCurrentUser();
 
         String newPassword = updatePasswordRequest.getNewPassword();
@@ -113,11 +109,11 @@ public class UserServiceImpl implements UserService {
         if (oldPassword == null || newPassword == null) {
             throw new BadRequestException("Old and New Password Required");
         }
+
         // Validate the old password.
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw new BadRequestException("Old Password not Correct");
         }
-
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepo.save(user);
 
@@ -160,18 +156,17 @@ public class UserServiceImpl implements UserService {
             // Generate a unique file name to avoid conflicts
             String originalFileName = file.getOriginalFilename();
             String fileExtension = "";
-            if (originalFileName != null && originalFileName.contains(".")) {
+
+            if (originalFileName != null && originalFileName.contains(".")){
                 fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
             }
-
             String newFileName = UUID.randomUUID() + fileExtension;
             Path filePath = uploadPath.resolve(newFileName);
 
             Files.copy(file.getInputStream(), filePath);
-
 //            String fileUrl = uploadDir + newFileName;
-            String fileUrl = "/profile-picture/" + newFileName;
 
+            String fileUrl = "/profile-picture/" + newFileName;
 
             user.setProfilePictureUrl(fileUrl);
             userRepo.save(user);
@@ -181,14 +176,30 @@ public class UserServiceImpl implements UserService {
                     .message("Profile picture uploaded successfully.")
                     .data(fileUrl)
                     .build();
-
+            
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
     }
-
-    @Override
-    public Response<?> uploadProfilePictureToS3(MultipartFile file) {
-        return null;
-    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -36,5 +36,6 @@ public class NotificationDTO {
     private LocalDateTime createdAt;
 
     private String templateName;
-    private Map<String , Object> templateVariables;
+    private Map<String, Object> templateVariables;
+
 }

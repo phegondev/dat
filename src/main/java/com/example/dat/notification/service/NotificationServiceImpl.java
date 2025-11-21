@@ -20,7 +20,8 @@ import java.nio.charset.StandardCharsets;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class NotificationServiceImpl implements NotificationService{
+public class NotificationServiceImpl implements NotificationService {
+
 
     private final NotificationRepo notificationRepo;
     private final JavaMailSender mailSender;
@@ -32,6 +33,7 @@ public class NotificationServiceImpl implements NotificationService{
     public void sendEmail(NotificationDTO notificationDTO, User user) {
 
         try {
+
             MimeMessage mimeMessage = mailSender.createMimeMessage();
 
             MimeMessageHelper helper = new MimeMessageHelper(
@@ -39,24 +41,20 @@ public class NotificationServiceImpl implements NotificationService{
                     MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
                     StandardCharsets.UTF_8.name()
             );
-
             helper.setTo(notificationDTO.getRecipient());
             helper.setSubject(notificationDTO.getSubject());
 
 
             // Use template if provided
-            if (notificationDTO.getTemplateName() != null){
-
+            if(notificationDTO.getTemplateName() != null){
                 Context context = new Context();
                 context.setVariables(notificationDTO.getTemplateVariables());
                 String htmlContent = templateEngine.process(notificationDTO.getTemplateName(), context);
 
                 helper.setText(htmlContent, true);
-
-            }else{
+            }else {
                 helper.setText(notificationDTO.getMessage(), true);
             }
-
 
             mailSender.send(mimeMessage);
             log.info("Email sent out");
@@ -79,3 +77,11 @@ public class NotificationServiceImpl implements NotificationService{
 
     }
 }
+
+
+
+
+
+
+
+

@@ -19,11 +19,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class PatientServiceImpl implements PatientService{
+public class PatientServiceImpl implements PatientService {
 
     private final PatientRepo patientRepo;
     private final UserService userService;
@@ -32,7 +31,6 @@ public class PatientServiceImpl implements PatientService{
 
     @Override
     public Response<PatientDTO> getPatientProfile() {
-
         User user = userService.getCurrentUser();
 
         Patient patient = patientRepo.findByUser(user)
@@ -47,7 +45,6 @@ public class PatientServiceImpl implements PatientService{
 
     @Override
     public Response<?> updatePatientProfile(PatientDTO patientDTO) {
-
 
         User currentUser = userService.getCurrentUser();
 
@@ -66,7 +63,6 @@ public class PatientServiceImpl implements PatientService{
             patient.setPhone(patientDTO.getPhone());
         }
 
-        // LocalDate field
         Optional.ofNullable(patientDTO.getDateOfBirth()).ifPresent(patient::setDateOfBirth);
 
         // Medical fields (knownAllergies, bloodGroup, genotype)
@@ -84,7 +80,6 @@ public class PatientServiceImpl implements PatientService{
                 .statusCode(200)
                 .message("Patient profile updated successfully.")
                 .build();
-
 
     }
 
@@ -122,8 +117,24 @@ public class PatientServiceImpl implements PatientService{
 
         return Response.<List<Genotype>>builder()
                 .statusCode(200)
-                .message("Genotypes retrieved successfully")
+                .message("Genotype retrieved successfully")
                 .data(genotypes)
                 .build();
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

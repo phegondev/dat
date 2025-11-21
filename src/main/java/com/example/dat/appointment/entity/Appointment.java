@@ -1,5 +1,6 @@
 package com.example.dat.appointment.entity;
 
+
 import com.example.dat.consultation.entity.Consultation;
 import com.example.dat.doctor.entity.Doctor;
 import com.example.dat.enums.AppointmentStatus;
@@ -13,11 +14,11 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "appointments")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "appointments")
 public class Appointment {
 
     @Id
@@ -26,7 +27,9 @@ public class Appointment {
 
     @Column(nullable = false)
     private LocalDateTime startTime;
+
     private LocalDateTime endTime;
+
     private String meetingLink;
 
     private String purposeOfConsultation;
@@ -47,5 +50,14 @@ public class Appointment {
     @OneToOne(mappedBy = "appointment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Consultation consultation;
 }
+
+
+
+
+
+
+
+
+
 
 

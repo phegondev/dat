@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "password_reset_code")
 @Data
 @Builder
-@Table(name = "password_reset_code")
 @AllArgsConstructor
 @NoArgsConstructor
 public class PasswordResetCode {
@@ -23,12 +23,13 @@ public class PasswordResetCode {
     @Column(unique = true)
     private String code;
 
-    @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false, name = "user_id")
-    private User user;
+    private boolean used;
 
     private LocalDateTime expiryDate;
 
-    private boolean used;
+    @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
 
 }

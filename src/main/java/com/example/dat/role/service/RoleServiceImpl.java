@@ -16,14 +16,13 @@ public class RoleServiceImpl implements RoleService {
 
     private final RoleRepo roleRepo;
 
-
     @Override
     public Response<Role> createRole(Role roleRequest) {
 
         Role savedRole = roleRepo.save(roleRequest);
 
         return Response.<Role>builder()
-                .statusCode(HttpStatus.OK.value())
+                .statusCode(200)
                 .message("Role Saved Successfully")
                 .data(savedRole)
                 .build();
@@ -38,31 +37,33 @@ public class RoleServiceImpl implements RoleService {
         role.setName(roleRequest.getName());
 
         Role updatedRole = roleRepo.save(role);
+
         return Response.<Role>builder()
-                .statusCode(HttpStatus.OK.value())
-                .message("Role updated successfully")
+                .statusCode(200)
+                .message("Role updated Successfully")
                 .data(updatedRole)
                 .build();
+
     }
 
     @Override
     public Response<List<Role>> getAllRoles() {
 
         List<Role> roles = roleRepo.findAll();
+
         return Response.<List<Role>>builder()
-                .statusCode(HttpStatus.OK.value())
+                .statusCode(200)
                 .message("Roles retreived successfully")
                 .data(roles)
                 .build();
-
     }
 
     @Override
     public Response<?> deleteRole(Long id) {
+
         if (!roleRepo.existsById(id)) {
             throw new NotFoundException("Role Not Found");
         }
-
         roleRepo.deleteById(id);
 
         return Response.builder()
@@ -70,4 +71,6 @@ public class RoleServiceImpl implements RoleService {
                 .message("Role deleted successfully")
                 .build();
     }
+
+
 }
